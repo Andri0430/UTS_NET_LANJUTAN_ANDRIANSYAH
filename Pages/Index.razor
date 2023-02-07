@@ -1,0 +1,157 @@
+﻿@page "/"
+@using UTS_NET_LANJUTAN_ANDRIANSYAH.Models
+
+<PageTitle>Index</PageTitle>
+
+<div class="row" style="display:flex">
+    <div class="col-7">
+        <div class="card">
+            <div class="card-header alert-success">
+                <h2 class="m-auto fw-bold">DAFTAR KATEGORI LIST BUKU</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered m-auto">
+                    <thead>
+                        <tr>
+                            <th>Genre</th>
+                            <th>Judul</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var buku in books)
+                        {
+                            <tr>
+                                <td style="display:flex; margin:auto">@buku.genre</td>
+                                <td>@buku.judul</td>
+                                <td>
+                                    <button class="btn btn-danger align-content-center" @onclick="(()=> Hapus(buku))">Hapus</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">
+                                <button class="btn btn-primary" style="display:flex; margin:auto" @onclick="(()=>Tambah())">Tambah Buku</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="card small">
+            <div class="card-header alert-success">
+                <h2 class="m-auto fw-bold">Detail Buku</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Genre</th>
+                            <th>Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Komik</td>
+                            <td>@stat.jumlahKomik</td>
+                        </tr>
+                        <tr>
+                            <td>Novel</td>
+                            <td>@stat.jumlahNovel</td>
+                        </tr>
+                        <tr>
+                            <td>Sejarah</td>
+                            <td>@stat.jumlahSejarah</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <h4 class="fw-bold">Total : @stat.Total</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code{
+    List<Buku> books = new List<Buku>();
+    Stats stat = new Stats();
+
+    List<string> genre = Enum.GetNames(typeof(Genre)).ToList();
+
+    List<string> judulAnime = new List<string>()
+    {
+        "One Piece","Black Clover","Jujutsu Kaisen",
+    };
+
+    List<string> judulNovel = new List<string>()
+    {
+         "Andrea Hirata","J.K Rowling","Tere Liye",
+    };
+
+    List<string> judulSejarah = new List<string>()
+    {
+        "Indonesia","Yunani","Jepang",
+    };
+
+    public string bufferGenre = string.Empty;
+    public string bufferKategori = string.Empty;
+
+    private void Tambah()
+    {
+        Random random = new Random();
+        int indexGenre = random.Next(genre.Count);
+        bufferGenre = genre[indexGenre];
+
+        int indexKategori = 0;
+        if (bufferGenre == Genre.Komik.ToString())
+        {
+            indexKategori = random.Next(judulAnime.Count);
+            bufferKategori = judulAnime[indexKategori];
+            stat.jumlahKomik++;
+        }
+        else if (bufferGenre == Genre.Novel.ToString())
+        {
+            indexKategori = random.Next(judulNovel.Count);
+            bufferKategori = judulNovel[indexKategori];
+            stat.jumlahNovel++;
+        }
+        else if (bufferGenre == Genre.Sejarah.ToString())
+        {
+            indexKategori = random.Next(judulSejarah.Count);
+            bufferKategori = judulSejarah[indexKategori];
+            stat.jumlahSejarah++;
+        }
+        indexKategori = 0;
+
+        books.Add(new Buku(bufferGenre, bufferKategori));
+    }
+
+    private void Hapus(Buku buku)
+    {
+        books.Remove(buku);
+
+        if(buku.genre == Genre.Komik.ToString())
+        {
+            stat.jumlahKomik--;
+        }
+        else if (buku.genre == Genre.Novel.ToString())
+        {
+            stat.jumlahNovel--;
+        }
+        else if (buku.genre == Genre.Sejarah.ToString())
+        {
+            stat.jumlahSejarah--;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Tambah();
+    }
+}
